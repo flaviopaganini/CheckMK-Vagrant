@@ -6,16 +6,16 @@ Dies ist die Dokumenation für das Vagrant File für einen CheckMK Server samt e
 Die Idee für dieses Projekt habe ich gefunden weil bei uns in der Firma auch CheckMK benutzt wird und ich wollte schon immer einmal einen eigen CheckMK aufsetzten. Vagrant ist nicht Optimal für das aber so kann ich schon einmal testen wie CheckMK funktioniert um es danach als richtige VM zu Instalieren.
 ___
 ## Setup
-   +---------------------------------------------------------------+
-   ! Notebook - Schulnetz 10.x.x.x und Privates Netz 192.168.55.1  !                 
-   ! Port: 8080 (192.158.55.101:80)                                !	
-   !                                                               !	
-   !    +--------------------+          +---------------------+    !
-   !    ! CheckMK Server     !          ! CheckMK Client      !    ! 
-   !    ! Host: checkmk      !          ! Host: client        !    !
-   !    ! IP: 192.168.55.100 ! <------> ! IP: 192.168.55.101  !    !
-   !    ! Port: 80           !          ! Port: -             !    !
-   !    ! Nat: 8080          !          ! Nat: -              !    !
-   !    +--------------------+          +---------------------+    !
-   !                                                               !	
-   +---------------------------------------------------------------+
+    +---------------------------------------------------------------+
+    ! Notebook - Schulnetz 10.x.x.x und Privates Netz 192.168.55.1  !                 
+    ! Port: 8080 (192.158.55.101:80)                                !	
+    !                                                               !	
+    !    +--------------------+          +---------------------+    !
+    !    ! CheckMK Server     !          ! CheckMK Client      !    ! 
+    !    ! Host: checkmk      !          ! Host: client        !    !
+    !    ! IP: 192.168.55.100 ! <------> ! IP: 192.168.55.101  !    !
+    !    ! Port: 80           !          ! Port: -             !    !
+    !    ! Nat: 8080          !          ! Nat: -              !    !
+    !    +--------------------+          +---------------------+    !
+    !                                                               !	
+    +---------------------------------------------------------------+
