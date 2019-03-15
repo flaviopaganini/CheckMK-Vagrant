@@ -20,4 +20,5 @@ ___
     !                                                               !	
     +---------------------------------------------------------------+
 Das Setup ist ganz einfach:
-1. In das geclonte verzeichnis wechseln
+1. In das geklonte Verzeichnis wechseln
+2. cmd.exe als Admin ausführen
