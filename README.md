@@ -22,3 +22,6 @@ ___
 Das Setup ist ganz einfach:
 1. In das geklonte Verzeichnis wechseln
 2. cmd.exe als Admin ausführen
+3. "vagrant up" eingeben
+4. Kurz Warten :-)
+5. [CheckMk](http://localhost:8080/TBZSide/check_mk/login.py)
