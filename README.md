@@ -20,11 +20,43 @@ ___
     !                                                               !	
     +---------------------------------------------------------------+
 Das Setup ist ganz einfach:
-1. In das geklonte Verzeichnis wechseln
-2. cmd.exe als Admin ausführen
-3. "vagrant up" eingeben
-4. Kurz Warten :-) bis `Reading state information... Done` in der Konsole steht
-5. [CheckMk Starten](http://localhost:8080/TBZSide/check_mk/login.py)
-6. Mit dem User `cmkadmin` und dem Passwort `Admin1234`
+1. In das geklonte Verzeichnis wechseln.
+2. cmd.exe als Admin ausführen.
+3. "vagrant up" eingeben.
+4. Kurz Warten :-) bis `Reading state information... Done` in der Konsole steht.
+5. [CheckMk Starten](http://localhost:8080/TBZSide/check_mk/login.py).
+6. Mit dem User `cmkadmin` und dem Passwort `Admin1234` anmelden.
 7. Fertig!
-S
+___
+## Vagrant File
+In diesem Teil wird das Vagrantfile beschriben.
+### VM Config 1
+    Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+        config.vm.define "checkmk" do |checkmk|
+        checkmk.vm.box = "ubuntu/xenial64"
+        checkmk.vm.hostname = "server"
+        checkmk.vm.network "private_network", ip:"192.168.55.100" 
+		checkmk.vm.network "forwarded_port", guest:80, host:8080, auto_correct: true
+		checkmk.vm.provider "virtualbox" do |vb|
+	  vb.memory = "512"  
+	end   
+In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Serviice ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
+### VM Befehl
+    checkmk.vm.provision "shell", inline: <<-SHELL
+		    sudo apt-get update
+		    sudo wget https://mathias-kettner.de/support/Check_MK-pubkey.gpg
+		    sudo wget https://mathias-kettner.de/support/1.4.0p38/check-mk-raw-1.4.0p38_0.xenial_amd64.deb
+		    sudo apt-key add Check_MK-pubkey.gpg
+                sudo apt-get -y install gdebi-core
+                sudo gdebi -n check-mk-raw-1.4.0p38_0.xenial_amd64.deb
+                sudo omd create TBZSide
+                sudo omd start TBZSide
+                wget http://192.168.55.100/TBZSide/check_mk/agents/check-mk-agent_1.4.0p38-1_all.deb
+                sudo gdebi -n check-mk-agent_1.4.0p38-1_all.deb
+                cd /omd/sites/TBZSide/etc
+                sudo rm htpasswd
+                sudo su
+                htpasswd -nb cmkadmin Admin1234 > htpasswd
+                exit
+        SHELL
+        end
