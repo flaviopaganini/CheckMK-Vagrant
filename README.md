@@ -23,5 +23,8 @@ Das Setup ist ganz einfach:
 1. In das geklonte Verzeichnis wechseln
 2. cmd.exe als Admin ausführen
 3. "vagrant up" eingeben
-4. Kurz Warten :-)
-5. [CheckMk](http://localhost:8080/TBZSide/check_mk/login.py)
+4. Kurz Warten :-) bis `Reading state information... Done` in der Konsole steht
+5. [CheckMk Starten](http://localhost:8080/TBZSide/check_mk/login.py)
+6. Mit dem User `cmkadmin` und dem Passwort `Admin1234`
+7. Fertig!
+S
