@@ -36,8 +36,8 @@ In diesem Teil wird das Vagrantfile beschriben.
         checkmk.vm.box = "ubuntu/xenial64"
         checkmk.vm.hostname = "server"
         checkmk.vm.network "private_network", ip:"192.168.55.100" 
-		checkmk.vm.network "forwarded_port", guest:80, host:8080, auto_correct: true
-		checkmk.vm.provider "virtualbox" do |vb|
+        checkmk.vm.network "forwarded_port", guest:80, host:8080, auto_correct: true
+        checkmk.vm.provider "virtualbox" do |vb|
 	  vb.memory = "512"  
 	end   
 In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Serviice ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
@@ -60,3 +60,33 @@ In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box f
                 exit
         SHELL
         end
+In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt weden:
+
+`sudo apt-get update` fürhrt ein Update aus.
+
+`sudo wget https://mathias-kettner.de/support/Check_MK-pubkey.gpg` lädt den Public Key herunter.
+
+`sudo wget https://mathias-kettner.de/support/1.4.0p38/check-mk-raw-1.4.0p38_0.xenial_amd64.deb` läd die CheckMK Instalations Datei herunter von der Ofizielen Seite.
+
+`sudo apt-key add Check_MK-pubkey.gpg` fügt den Public Key hinzu damit dan es auch instaliert werden kann.
+
+`sudo apt-get -y install gdebi-core` instaliert gdebi welches für die Instalation benötigt wird.
+
+`sudo gdebi -n check-mk-raw-1.4.0p38_0.xenial_amd64.deb` instaliert mit gdebi CheckMK, der Parameter -n instaliert es ohne nachzufragen.
+
+`sudo omd create TBZSide` mit diesem Befehl wird in CheckMK eine neue Seite erstellt, für hier wird sie TBZSide genant.
+
+`sudo omd start TBZSide` mit disem Befehl wird die vorhin erstellte seite gestartet.
+
+``
+
+``
+
+``
+
+``
+
+``
+
+``
+
