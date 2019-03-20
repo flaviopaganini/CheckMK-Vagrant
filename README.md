@@ -4,8 +4,8 @@
 * [Einleitung](#Einleitung)<br>
 * [Setup](#Setup)<br>
 * [Vagrant File](#Vagrant-File)<br>
-  * [VM 1](#Vagrant-File)<br>
-  * [VM 2](#Vagrant-File)<br>
+  * [VM 1](#vm-config-1)<br>
+  * [VM 2](#vm-config-2)<br>
 ## Einleitung
 Dies ist die Dokumenation für das Vagrant File für einen CheckMK Server samt einem CheckMK Test Client. Der CheckMK Server ist sobal das Vagrantfile durchgelaufen ist über `http://localhost:8080/TBZSide/check_mk/login.py` ereichbar. Mit den Default einstellungen von dem Vagrantfile wird dem Benutzer `cmkadmin` das Passwort `Admin1234` gesetzt. Es werden zwei Boxen gestartet mit je 512MB Ram. Die beiden Boxen sind über ein Boxen internes Netzwerk verbunden. Der Server hat die IP `192.168.55.100` und der Client hat `192.168.55.101`. Der Client ist vom Host aus nur via SSH ereichbar, sonst ist er hinter der NAT Firewall von VirtualBox geschützt. Der CheckMK Server ist nur via Port 8080 und dem SSH Port ereichbar.
 
@@ -97,3 +97,16 @@ In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt we
 `htpasswd -nb cmkadmin Admin1234 > htpasswd` Neue htpasswd erstellen mit dem User `cmkadmin` und dem Passwort `Admin1234`.
 
 `exit` Beenden der Konsole.
+
+### VM Config 1
+    Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+        config.vm.define "checkmk" do |checkmk|
+        checkmk.vm.box = "ubuntu/xenial64"
+        checkmk.vm.hostname = "server"
+        checkmk.vm.network "private_network", ip:"192.168.55.100" 
+        checkmk.vm.network "forwarded_port", guest:80, host:8080, auto_correct: true
+        checkmk.vm.provider "virtualbox" do |vb|
+	  vb.memory = "512"  
+	end   
+In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Serviice ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
+### VM Befehl
