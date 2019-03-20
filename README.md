@@ -6,6 +6,7 @@
 * [Vagrant File](#Vagrant-File)<br>
   * [VM 1](#vm-config-1)<br>
   * [VM 2](#vm-config-2)<br>
+* [Client in CheckMK aufnehmen](#Client-in-CheckMK-Aufnehmen)<br>
 ## Einleitung
 Dies ist die Dokumenation für das Vagrant File für einen CheckMK Server samt einem CheckMK Test Client. Der CheckMK Server ist sobal das Vagrantfile durchgelaufen ist über `http://localhost:8080/TBZSide/check_mk/login.py` ereichbar. Mit den Default einstellungen von dem Vagrantfile wird dem Benutzer `cmkadmin` das Passwort `Admin1234` gesetzt. Es werden zwei Boxen gestartet mit je 512MB Ram. Die beiden Boxen sind über ein Boxen internes Netzwerk verbunden. Der Server hat die IP `192.168.55.100` und der Client hat `192.168.55.101`. Der Client ist vom Host aus nur via SSH ereichbar, sonst ist er hinter der NAT Firewall von VirtualBox geschützt. Der CheckMK Server ist nur via Port 8080 und dem SSH Port ereichbar.
 
@@ -46,7 +47,7 @@ In diesem Teil wird das Vagrantfile beschriben.
         checkmk.vm.provider "virtualbox" do |vb|
 	  vb.memory = "512"  
 	end   
-In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Serviice ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
+In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Service ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
 ### VM Befehl
     checkmk.vm.provision "shell", inline: <<-SHELL
 		    sudo apt-get update
@@ -66,7 +67,7 @@ In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box f
                 exit
         SHELL
         end
-In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt weden:
+In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt weden beschriben:
 
 `sudo apt-get update` fürhrt ein Update aus.
 
@@ -98,15 +99,34 @@ In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt we
 
 `exit` Beenden der Konsole.
 
-### VM Config 1
-    Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-        config.vm.define "checkmk" do |checkmk|
-        checkmk.vm.box = "ubuntu/xenial64"
-        checkmk.vm.hostname = "server"
-        checkmk.vm.network "private_network", ip:"192.168.55.100" 
-        checkmk.vm.network "forwarded_port", guest:80, host:8080, auto_correct: true
-        checkmk.vm.provider "virtualbox" do |vb|
-	  vb.memory = "512"  
-	end   
-In diesem Teil wird die ester VM definiert, in diesem Fall der Server. Die Box für diesen Serviice ist die `ubuntu/xenial64` Box. Der Hostname wird auf `Server` gesetzt. Die VM bekommt zwei Adapter einen NAT und den anderen in einem intern Netzwerk. Der Nat-Netzwerkadapter leitet den Internen Port 80 auf den Port 8080 um, zusätzlich wird von Vagrant der SSH, dieser Port ist Dynamisch. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client. Der Server hat die die interne IP `192.168.55.100`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
+### VM Config 2
+    config.vm.define "client" do |client|
+    	client.vm.box = "ubuntu/xenial64"
+    	client.vm.hostname = "client"
+    	client.vm.network "private_network", ip:"192.168.55.101" 
+	client.vm.provider "virtualbox" do |vb|
+		vb.memory = "512"  
+	end    
+In diesem Teil wird die zweite VM definiert, in diesem Fall der Client. Die Box für diesen Service ist die `ubuntu/xenial64` Box. Der Hostname wird auf `client` gesetzt. Die VM bekommt nur ein Adapter der von dem intern Netzwerk. Das interne Netzwerk ist für die komunikation zwischen Server und dem Client benutzt. Der Client hat die die interne IP `192.168.55.101`. Der Vm wird 512 MB Ram zugewiesen, was für ein kleines Liunux reicht.
 ### VM Befehl
+	client.vm.provision "shell", inline: <<-SHELL
+		sudo apt-get -y install gdebi-core
+		sudo apt-get -y install xinetd
+		wget http://192.168.55.100/TBZSide/check_mk/agents/check-mk-agent_1.4.0p38-1_all.deb
+		sudo gdebi -n check-mk-agent_1.4.0p38-1_all.deb
+		SHELL
+	end
+
+`sudo apt-get -y install gdebi-core` instaliert gdebi welches für die Instalation benötigt wird.
+
+`sudo apt-get -y install xinetd` instaliert xinetd welches für die Instalation benötigt wird.
+
+`wget http://192.168.55.100/TBZSide/check_mk/agents/check-mk-agent_1.4.0p38-1_all.deb` Mit diesem Befel wird der CheckMK Agent auf dem Client heruntergeladen.
+
+`sudo gdebi -n check-mk-agent_1.4.0p38-1_all.deb` Instaliert den herunter geladen Agent.
+
+Schon ist der Client bereit in CheckMK aufgennomen zu werden.
+
+___
+## Client in CheckMK Aufnehmen
+Sobald der die Instalation abgeschlossen ist kann man CheckMK öffnen [Link](http://localhost:8080/TBZSide/check_mk/login.py). Danach meldet man sich mit `cmkadmin` und `Admin1234` an. Auf dem Dashboard von CheckMK geht man dan Links unter WATO auf Hosts und dan gibt es oben einen Button `New Host`. Bei dem Hostname gibt man die IP des Clients an den Man überwachen möchte. In diesem Fall die IP `192.168.55.101`. Danach kann man unten auf `Save & Test`. In der Service übersicht sieht man die möglichen Services die überwacht werden können. Mit dem klick auf `Monitor all` kann man alle verfügbaren Services überwachen. Danach muss man diese Änderung nur noch speichen, dies kann  damit
