@@ -1,9 +1,9 @@
 # Vagarnt-CheckMK
 © By Flavio Paganini ST16E
 ## Inhaltsverzeichnis
-[Einleitung](#Einleitung)<br>
-[Setup](#Setup)<br>
-[Vagrant File](#Vagrant-File)<br>
+* [Einleitung](#Einleitung)<br>
+* [Setup](#Setup)<br>
+* [Vagrant File](#Vagrant-File)<br>
 ## Einleitung
 Dies ist die Dokumenation für das Vagrant File für einen CheckMK Server samt einem CheckMK Test Client. Der CheckMK Server ist sobal das Vagrantfile durchgelaufen ist über `http://localhost:8080/TBZSide/check_mk/login.py` ereichbar. Mit den Default einstellungen von dem Vagrantfile wird dem Benutzer `cmkadmin` das Passwort `Admin1234` gesetzt. Es werden zwei Boxen gestartet mit je 512MB Ram. Die beiden Boxen sind über ein Boxen internes Netzwerk verbunden. Der Server hat die IP `192.168.55.100` und der Client hat `192.168.55.101`. Der Client ist vom Host aus nur via SSH ereichbar, sonst ist er hinter der NAT Firewall von VirtualBox geschützt. Der CheckMK Server ist nur via Port 8080 und dem SSH Port ereichbar.
 
@@ -82,15 +82,16 @@ In diesem Teil sind die einzelnen Befhle die nach der Instalation ausgeführt we
 
 `sudo omd start TBZSide` mit disem Befehl wird die vorhin erstellte seite gestartet.
 
-``
+`wget http://192.168.55.100/TBZSide/check_mk/agents/check-mk-agent_1.4.0p38-1_all.deb` Mit diesem Befel wird der CheckMK Agent auf dem Server heruntergeladen.
 
-``
+`sudo gdebi -n check-mk-agent_1.4.0p38-1_all.deb` Instaliert den herunter geladen Agent.
 
-``
+`cd /omd/sites/TBZSide/etc` Wechslen in das Web Root Verzeichnis der Webseite.
 
-``
+`sudo rm htpasswd` Löschen der alten `htpasswd` Datei.
 
-``
+`sudo su` in den Root User wechseln.
 
-``
+`htpasswd -nb cmkadmin Admin1234 > htpasswd` Neue htpasswd erstellen mit dem User `cmkadmin` und dem Passwort `Admin1234`.
 
+`exit` Beenden der Konsole.
